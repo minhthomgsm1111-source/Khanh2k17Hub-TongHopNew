@@ -311,7 +311,7 @@ end
 -- TAB THÔNG TIN
 local addInfo = createTab("Thông tin")
 addInfo("Copy Link Discord", function()
-    local discordLink = ""
+    local discordLink = "https://discord.gg/4uS2CbC6d"
     if setclipboard then
         setclipboard(discordLink)
         StarterGui:SetCore("SendNotification", {
