@@ -1,0 +1,598 @@
+-- Delta Executor Multi-Tab Script Hub (Removed numbers from tab names)
+
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+local StarterGui = game:GetService("StarterGui")
+
+local localPlayer = Players.LocalPlayer
+
+-- Xóa UI cũ nếu có
+if CoreGui:FindFirstChild("DeltaMultiTabHub") then
+    CoreGui.DeltaMultiTabHub:Destroy()
+end
+
+-- Tạo ScreenGui chính
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "DeltaMultiTabHub"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- 1. NÚT BẬT TẮT MENU (Có gắn hình ảnh ID 1000015185 & kéo thả được)
+local toggleBtn = Instance.new("ImageButton")
+toggleBtn.Name = "ToggleMenuBtn"
+toggleBtn.Size = UDim2.new(0, 50, 0, 50)
+toggleBtn.Position = UDim2.new(0, 20, 0.3, 0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+toggleBtn.BackgroundTransparency = 0.3
+toggleBtn.Image = "rbxassetid://1000014847"
+toggleBtn.Active = true
+toggleBtn.Draggable = true
+toggleBtn.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(1, 0)
+toggleCorner.Parent = toggleBtn
+
+local toggleStroke = Instance.new("UIStroke")
+toggleStroke.Color = Color3.fromRGB(0, 162, 255)
+toggleStroke.Thickness = 1.5
+toggleStroke.Transparency = 0.3
+toggleStroke.Parent = toggleBtn
+
+-- 2. KHUNG MENU CHÍNH
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 520, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -260, 0.5, -160)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BackgroundTransparency = 0.2
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(0, 162, 255)
+mainStroke.Thickness = 1.5
+mainStroke.Transparency = 0.3
+mainStroke.Parent = mainFrame
+
+-- Bật/tắt menu chính khi bấm nút tròn
+toggleBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+
+-- Thanh tiêu đề
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 35)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+topBar.BackgroundTransparency = 0.3
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+
+local topCorner = Instance.new("UICorner")
+topCorner.CornerRadius = UDim.new(0, 12)
+topCorner.Parent = topBar
+
+local coverFix = Instance.new("Frame")
+coverFix.Size = UDim2.new(1, 0, 0, 10)
+coverFix.Position = UDim2.new(0, 0, 1, -10)
+coverFix.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+coverFix.BackgroundTransparency = 0.3
+coverFix.BorderSizePixel = 0
+coverFix.Parent = topBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -40, 1, 0)
+titleLabel.Position = UDim2.new(0, 12, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "MULTI-TAB SCRIPT HUB - BLOX FRUITS"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 12
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
+
+-- ================= KHUNG XÁC NHẬN KHI BẤM NÚT ĐÓNG (X) =================
+local confirmOverlay = Instance.new("Frame")
+confirmOverlay.Size = UDim2.new(1, 0, 1, 0)
+confirmOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+confirmOverlay.BackgroundTransparency = 0.5
+confirmOverlay.Visible = false
+confirmOverlay.ZIndex = 10
+confirmOverlay.Parent = mainFrame
+
+local confirmBox = Instance.new("Frame")
+confirmBox.Size = UDim2.new(0, 280, 0, 130)
+confirmBox.Position = UDim2.new(0.5, -140, 0.5, -65)
+confirmBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+confirmBox.BackgroundTransparency = 0.1
+confirmBox.ZIndex = 11
+confirmBox.Parent = confirmOverlay
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 10)
+boxCorner.Parent = confirmBox
+
+local boxStroke = Instance.new("UIStroke")
+boxStroke.Color = Color3.fromRGB(200, 50, 50)
+boxStroke.Thickness = 1.5
+boxStroke.Parent = confirmBox
+
+local confirmText = Instance.new("TextLabel")
+confirmText.Size = UDim2.new(1, 0, 0, 50)
+confirmText.Position = UDim2.new(0, 0, 0, 15)
+confirmText.BackgroundTransparency = 1
+confirmText.Text = "Bạn có chắc muốn xoá hoàn toàn Hub không?"
+confirmText.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmText.TextSize = 12
+confirmText.Font = Enum.Font.GothamBold
+confirmText.ZIndex = 12
+confirmText.Parent = confirmBox
+
+local btnKeep = Instance.new("TextButton")
+btnKeep.Size = UDim2.new(0, 115, 0, 35)
+btnKeep.Position = UDim2.new(0, 15, 1, -45)
+btnKeep.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+btnKeep.Text = "Tiếp tục (Giữ lại)"
+btnKeep.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnKeep.TextSize = 11
+btnKeep.Font = Enum.Font.GothamSemibold
+btnKeep.ZIndex = 12
+btnKeep.Parent = confirmBox
+
+local keepCorner = Instance.new("UICorner")
+keepCorner.CornerRadius = UDim.new(0, 6)
+keepCorner.Parent = btnKeep
+
+local btnDelete = Instance.new("TextButton")
+btnDelete.Size = UDim2.new(0, 115, 0, 35)
+btnDelete.Position = UDim2.new(1, -130, 1, -45)
+btnDelete.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+btnDelete.Text = "Xoá (Thoát)"
+btnDelete.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnDelete.TextSize = 11
+btnDelete.Font = Enum.Font.GothamSemibold
+btnDelete.ZIndex = 12
+btnDelete.Parent = confirmBox
+
+local deleteCorner = Instance.new("UICorner")
+deleteCorner.CornerRadius = UDim.new(0, 6)
+deleteCorner.Parent = btnDelete
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 26, 0, 26)
+closeBtn.Position = UDim2.new(1, -32, 0.5, -13)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.BackgroundTransparency = 0.2
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextSize = 12
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = topBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeBtn
+
+closeBtn.MouseButton1Click:Connect(function()
+    confirmOverlay.Visible = true
+end)
+
+btnKeep.MouseButton1Click:Connect(function()
+    confirmOverlay.Visible = false
+end)
+
+btnDelete.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- ================= HỆ THỐNG TAB =================
+local tabListFrame = Instance.new("ScrollingFrame")
+tabListFrame.Size = UDim2.new(0, 130, 1, -45)
+tabListFrame.Position = UDim2.new(0, 0, 0, 40)
+tabListFrame.BackgroundTransparency = 1
+tabListFrame.BorderSizePixel = 0
+tabListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+tabListFrame.ScrollBarThickness = 2
+tabListFrame.Parent = mainFrame
+
+local tabLayout = Instance.new("UIListLayout")
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0, 5)
+tabLayout.Parent = tabListFrame
+
+tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    tabListFrame.CanvasSize = UDim2.new(0, 0, 0, tabLayout.AbsoluteContentSize.Y + 10)
+end)
+
+local contentContainer = Instance.new("Folder")
+contentContainer.Name = "ContentContainer"
+contentContainer.Parent = mainFrame
+
+local tabs = {}
+
+local function createTab(tabName)
+    local tabBtn = Instance.new("TextButton")
+    tabBtn.Size = UDim2.new(1, -10, 0, 35)
+    tabBtn.Position = UDim2.new(0, 5, 0, 0)
+    tabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    tabBtn.BackgroundTransparency = 0.5
+    tabBtn.Text = tabName
+    tabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+    tabBtn.TextSize = 11
+    tabBtn.Font = Enum.Font.GothamSemibold
+    tabBtn.Parent = tabListFrame
+
+    local tabCorner = Instance.new("UICorner")
+    tabCorner.CornerRadius = UDim.new(0, 6)
+    tabCorner.Parent = tabBtn
+
+    local page = Instance.new("ScrollingFrame")
+    page.Size = UDim2.new(1, -145, 1, -45)
+    page.Position = UDim2.new(0, 140, 0, 40)
+    page.BackgroundTransparency = 1
+    page.BorderSizePixel = 0
+    page.CanvasSize = UDim2.new(0, 0, 0, 0)
+    page.ScrollBarThickness = 4
+    page.Visible = false
+    page.Parent = contentContainer
+
+    local grid = Instance.new("UIGridLayout")
+    grid.CellSize = UDim2.new(0, 115, 0, 40)
+    grid.CellPadding = UDim2.new(0, 8, 0, 8)
+    grid.SortOrder = Enum.SortOrder.LayoutOrder
+    grid.Parent = page
+
+    grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        page.CanvasSize = UDim2.new(0, 0, 0, grid.AbsoluteContentSize.Y + 15)
+    end)
+
+    tabBtn.MouseButton1Click:Connect(function()
+        for _, t in pairs(tabs) do
+            t.Page.Visible = false
+            t.Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            t.Btn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        end
+        page.Visible = true
+        tabBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+        tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end)
+
+    if #tabs == 0 then
+        page.Visible = true
+        tabBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+        tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+
+    table.insert(tabs, {Btn = tabBtn, Page = page})
+
+    local function addButton(scriptTitle, callback)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 115, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        btn.BackgroundTransparency = 0.4
+        btn.Text = scriptTitle
+        btn.TextColor3 = Color3.fromRGB(220, 220, 220)
+        btn.TextSize = 11
+        btn.Font = Enum.Font.GothamSemibold
+        btn.Parent = page
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 6)
+        corner.Parent = btn
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = Color3.fromRGB(60, 60, 60)
+        stroke.Thickness = 1
+        stroke.Transparency = 0.5
+        stroke.Parent = btn
+
+        btn.MouseButton1Click:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+            task.wait(0.15)
+            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            pcall(function()
+                callback()
+            end)
+        end)
+    end
+
+    return addButton
+end
+
+-- ================= KHỞI TẠO CÁC TAB =================
+
+-- TAB THÔNG TIN
+local addInfo = createTab("Thông tin")
+addInfo("Copy Link Discord", function()
+    local discordLink = ""
+    if setclipboard then
+        setclipboard(discordLink)
+        StarterGui:SetCore("SendNotification", {
+            Title = "Thành công!",
+            Text = "Đã copy xong discord!",
+            Duration = 3
+        })
+    else
+        warn("Executor không hỗ trợ hàm setclipboard!")
+    end
+end)
+
+-- TAB FARM
+local addFarm = createTab("Farm")
+addFarm("Hoho Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))()
+end)
+
+addFarm("Maru Hub", function()
+    getgenv().Team = "Marines"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"))()
+end)
+
+addFarm("Redz Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/BloxFruits/main/redz9999"))()
+end)
+
+addFarm("Redz Hub ( cũ )", function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-redz-245775"))()
+end)
+
+addFarm("Quantum Onyx", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
+end)
+
+addFarm("Neru Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/NeroHubClub/AutoMythicFruitFinder/refs/heads/main/NeroHubFruitFinder"))()
+end)
+
+addFarm("Tuấn Anh iOS", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AnhTuanDzai-Hub/TuanAnhIOS/refs/heads/main/TuanAnhIOS-Main.Lua"))()
+end)
+
+addFarm("AnDepZai Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/h6hbii/AnDepZaiHub/refs/heads/main/AndepzaiHub.lua"))()
+end)
+
+addFarm("AnDepZai Beta", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"))()
+end)
+
+addFarm("Strawberry Hub", function()
+    _G.Version = "Beta"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LongHiHiScript/Main-StrawberryHub/refs/heads/main/BloxKidMain.lua"))()
+end)
+
+addFarm("Banana Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"))()
+end)
+
+addFarm("Speed Hub X", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))()
+end)
+
+addFarm("Vxeze Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/VxezeHubMain"))()
+end)
+
+addFarm("DatThg Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/DatThg/refs/heads/main/DatThgV2"))()
+end)
+
+addFarm("Alchemy Hub", function()
+    loadstring(game:HttpGet("https://scripts.alchemyhub.xyz"))()
+end)
+
+addFarm("Ko biết tên", function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/80a557829defe42d381746809857e884.lua"))()
+end)
+
+addFarm("Ko bt tên", function()
+    loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/3b2169cf53bc6104dabe8e19562e5cc2.lua"))()
+end)
+
+-- TAB KAITUN
+local addKaitun = createTab("Kaitun")
+addKaitun("Silver Hub", function()
+    repeat task.wait() until game:IsLoaded()
+    _G.Start_Kaitun = false
+    _G.Config = true
+    _G.Settings = {
+        Main = {
+            ["Auto Farm"] = true,
+            ["Auto Go To Fruit"] = true,
+            ["Store Fruit"] = true,
+
+            ["Buy Fruit"] = true,
+            ["Select Fruit"] = {
+                "Lepoard-Lepoard",
+                "Dough-Dough",
+                "Linght-Linght",
+            },
+
+            ["Auto Saber"] = true,
+            ["Auto Pole"] = true,
+
+            ["Auto New World"] = true,
+
+            ["Thire World"] = true,
+            ["Auto Bartilo Quest"] = true,
+            ["Auto Rengoku"] = true,
+            ["Open Flamingo Access"] = true,
+            ["Midnight Blade"] = true,
+            ["Auto Factory Farm"] = true,
+            ["Auto Super Human"] = true,
+
+            ["Auto Yama"] = true,
+            ["Auto Tushita"] = true,
+            ["Auto ElectricClaw"] = true,
+            ["Auto Farm Mastery Sword All"] = true,
+            ["Auto Soul Guitar"] = true,
+        },
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/minhhau207/SilverHub/main/Kaitun2"))()
+end)
+
+addKaitun("Teddy Hub", function()
+    repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+    getgenv().AutoExecute = true 
+    getgenv().SettingFarm ={
+        ["Reset Teleport"] = {
+            ["Enabled"] = false,
+            ["Delay Reset"] = 3,
+            ["Item Dont Reset"] = {
+                ["Fruit"] = {
+                    ["Enabled"] = true,
+                    ["All Fruit"] = true, 
+                    ["Select Fruit"] = {
+                        ["Enabled"] = false,
+                        ["Fruit"] = {},
+                    },
+                },
+            },
+        },
+        ["White Screen"] = false,
+        ["Lock Fps"] = {
+            ["Enabled"] = true,
+            ["FPS"] = 60,
+        },
+        ["Get Items"] = {
+            ["Saber"] = true,
+            ["Godhuman"] =  true,
+            ["Skull Guitar"] = true,
+            ["Mirror Fractal"] = true,
+            ["Cursed Dual Katana"] = true,
+            ["Upgrade Race V2-V3"] = true,
+            ["Auto Pull Lever"] = true,
+            ["Shark Anchor"] = true,
+        },
+        ["Get Rare Items"] = {
+            ["Rengoku"] = true,
+            ["Dragon Trident"] = true,
+            ["Pole (1st Form)"] = true,
+            ["Gravity Blade"]  = true,
+        },
+        ["Farm Fragments"] = {
+            ["Enabled"]  = false,
+            ["Fragment"] = 50000,
+        },
+        ["Auto Chat"] = {
+            ["Enabled"] = false,
+            ["Text"] = "",
+        },
+        ["Auto Summon Rip Indra"] = true,
+        ["Select Hop"] = {
+            ["Hop Server If Have Player Near"] = false, 
+            ["Hop Find Rip Indra Get Valkyrie Helm or Get Tushita"] = true, 
+            ["Hop Find Dough King Get Mirror Fractal"] = true,
+            ["Hop Find Raids Castle [CDK]"] = true,
+            ["Hop Find Cake Queen [CDK]"] = true,
+            ["Hop Find Soul Reaper [CDK]"] = true,
+            ["Hop Find Darkbeard [SG]"] = true,
+            ["Hop Find Mirage [ Pull Lever ]"] = true,
+        },
+        ["Farm Mastery"] = {
+            ["Melee"] = false,
+            ["Sword"] = false,
+        },
+        ["Buy Haki"] = {
+            ["Enhancement"] = true,
+            ["Skyjump"] = true,
+            ["Flash Step"] = true,
+            ["Observation"] = true,
+        },
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TeddyHub-kaitunBF.lua"))()
+end)
+
+addKaitun("BlueX Hub", function()
+    getgenv().Config = {
+        ["Setting"] = {
+            ["UiCheckItem"] = false,
+            ["White Screen"] = false
+        },       
+        ["MainItem"] = {
+            ["Saber"] = true,         
+            ["Hallow Scythe"] = true,
+            ["GodHuman"] = true,
+            ["Skull Guitar"] = true,
+            ["Cursed Dual Katana"] = true
+        },
+        ["MiscItem"] = {
+            ["Feathered Visage"] = true,
+            ["Pole1st"] = true,
+            ["Dragon Trident"] = true,
+            ["Spikey Trident"] = true,
+            ["Buddy"] = true,
+            ["Cavender"] = true,
+            ["Twin Hooks"] = true,
+            ["Gravity Blade"] = true,
+            ["Venom Bow"] = true
+        },
+        ["Quest"] = {
+            ["Race V2"] = true,
+            ["Race V3"] = true,
+            ["Haki Rainbow"] = true
+        },
+        ["Webhook"] = {
+            ["Enable"] = false,
+            ["UrlWebhook"] = "",
+        }
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/KaitunBloxFruits.lua"))()
+end)
+
+-- TAB PVP
+local addPvP = createTab("PvP")
+addPvP("KhanhHubPvP", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/minhthomgsm1111-source/Khanh2k17Hub/refs/heads/main/KhanhPvP-Hub-HoiLohehe.txt"))()
+end)
+
+addPvP("CentuDoxHub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JustParadozCode/CentuDox-Hub/refs/heads/main/CentuDox%20Aimbot.xyz"))()
+end)
+
+-- TAB FARM CHEST
+local addFarmChest = createTab("Farm Chest")
+addFarmChest("Grai Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Graihub/graihubfarmchestv2/refs/heads/main/farmchestv2"))()
+end)
+
+addFarmChest("Long hihi hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/Auto-Chest/refs/heads/main/MainV1.Luau"))()
+end)
+
+-- TAB FIX LAG
+local addFixLag = createTab("Fix Lag")
+addFixLag("Khanh Hub Fix Lag", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/minhthomgsm1111-source/Khanh2k17Hub/refs/heads/main/Script-fixlag-ByKhanh-2k17.txt"))()
+end)
+
+addFixLag("Turbo Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/TIKTOK-BOYCHOIGAME/PH-ICH-U/refs/heads/main/FIXLAGV2.BOYCHOIGAME"))()
+end)
+
+addFixLag("Turbo Fix Lag (2)", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"))()
+end)
+
+-- TAB HOP SERVER
+local addHopServer = createTab("Hop Server")
+addHopServer("Teddy Hub", function()
+    repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/teddyhubdev/diepvy/refs/heads/main/HopBoss.lua"))()
+end)
+
+addHopServer("Realkid Hub", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()
+end)
+
+addHopServer("Night Hub", function()
+    getgenv().Team = "Marines"
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"))()
+end)
